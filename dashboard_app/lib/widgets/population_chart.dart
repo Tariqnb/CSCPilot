@@ -1,3 +1,4 @@
+// lib/widgets/population_chart.dart
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart' as graphic;
@@ -18,7 +19,7 @@ class _PopulationChartState extends State<PopulationChart> {
     final minYear = selectedMinYear != null ? int.tryParse(selectedMinYear!) : null;
     final maxYear = selectedMaxYear != null ? int.tryParse(selectedMaxYear!) : null;
     final filteredData = widget.data.where((e) {
-    final yearInt = int.tryParse(e.year) ?? 0;
+      final yearInt = int.tryParse(e.year) ?? 0;
       if (minYear != null && maxYear != null) {
         return yearInt >= minYear && yearInt <= maxYear;
       } else if (minYear != null) {
@@ -42,7 +43,7 @@ class _PopulationChartState extends State<PopulationChart> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Filter by Year Range:', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(' ', style: TextStyle(fontWeight: FontWeight.bold)),
                 Row(
                   children: [
                     DropdownButton<String>(
