@@ -28,7 +28,7 @@ class PopulationGraphicChart extends StatelessWidget {
       marks: [
         LineMark(
           position: Varset('year') * Varset('population'),
-          shape: ShapeEncode(value: BasicLineShape(smooth: true)), // <-- Correct here
+          shape: ShapeEncode(value: BasicLineShape(smooth: true)), 
           color: ColorEncode(value: Colors.deepPurple),
           size: SizeEncode(value: 3),
         ),

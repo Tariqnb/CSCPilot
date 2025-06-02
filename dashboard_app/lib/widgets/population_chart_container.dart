@@ -1,4 +1,3 @@
-// lib/widgets/population_chart_container.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/population_data.dart';
