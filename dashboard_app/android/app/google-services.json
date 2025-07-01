@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "513196921710",
+    "project_id": "populationcharts",
+    "storage_bucket": "populationcharts.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513196921710:android:852b803f099e7104b0a77f",
+        "android_client_info": {
+          "package_name": "com.example.dashboard_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdMpYY6WLBC7k-Eh2z9ZS8ieJ9VFRmfcA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

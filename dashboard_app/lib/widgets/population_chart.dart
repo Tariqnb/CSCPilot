@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart' as graphic;
+import 'package:pie_chart/pie_chart.dart' as pie;
 import '../models/population_data.dart';
 
 class PopulationChart extends StatefulWidget {
@@ -9,6 +10,7 @@ class PopulationChart extends StatefulWidget {
   @override
   State<PopulationChart> createState() => _PopulationChartState();
 }
+
 class _PopulationChartState extends State<PopulationChart> {
   String? selectedMinYear;
   String? selectedMaxYear;
@@ -17,31 +19,35 @@ class _PopulationChartState extends State<PopulationChart> {
     final years = widget.data.map((e) => e.year).toSet().toList()..sort();
     final minYear = selectedMinYear != null ? int.tryParse(selectedMinYear!) : null;
     final maxYear = selectedMaxYear != null ? int.tryParse(selectedMaxYear!) : null;
-  final filteredData = widget.data.where((e) {
-  final yearInt = int.tryParse(e.year) ?? 0;
-  if (minYear != null && maxYear != null) {
-    return yearInt >= minYear && yearInt <= maxYear;
-  } else if (minYear != null) {
-    return yearInt >= minYear;
-  } else if (maxYear != null) {
-    return yearInt <= maxYear;
-  }
-  return true;
-}).toList();
-final chartData = filteredData
-  .map((e) => {
-    'year': int.tryParse(e.year),
-    'population': e.population,
-  })
-  .where((e) => e['year'] != null)
-  .toList()
-..sort((a, b) => a['year']!.compareTo(b['year']!)); 
-final spots = chartData
-  .map((e) => FlSpot(
-    (e['year'] as int).toDouble(),
-    (e['population'] as int).toDouble(),
-  ))
-  .toList();
+    final filteredData = widget.data.where((e) {
+      final yearInt = int.tryParse(e.year) ?? 0;
+      if (minYear != null && maxYear != null) {
+        return yearInt >= minYear && yearInt <= maxYear;
+      } else if (minYear != null) {
+        return yearInt >= minYear;
+      } else if (maxYear != null) {
+        return yearInt <= maxYear;
+      }
+      return true;
+    }).toList();
+    final chartData = filteredData
+        .map((e) => {
+              'year': int.tryParse(e.year),
+              'population': e.population,
+            })
+        .where((e) => e['year'] != null)
+        .toList()
+      ..sort((a, b) => a['year']!.compareTo(b['year']!));
+    final donutData = chartData.where((e) {
+      final year = e['year'] as int;
+      return year >= 2013 && year <= 2023;
+    }).toList();
+    final spots = chartData
+        .map((e) => FlSpot(
+              (e['year'] as int).toDouble(),
+              (e['population'] as int).toDouble(),
+            ))
+        .toList();
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -281,7 +287,7 @@ final spots = chartData
             Padding(
               padding: const EdgeInsets.all(16),
               child: SizedBox(
-                height: 310, 
+                height: 310,
                 width: double.infinity,
                 child: BarChart(
                   BarChartData(
@@ -301,98 +307,145 @@ final spots = chartData
                               color: Colors.white,
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    titlesData: FlTitlesData(
+                      bottomTitles: AxisTitles(
+                        axisNameWidget: const Padding(
+                          padding: EdgeInsets.only(top: 4),
+                          child: Text(
+                            '',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 36,
+                          getTitlesWidget: (value, _) {
+                            final index = value.toInt();
+                            if (index >= 0 && index < chartData.length) {
+                              final year = chartData[index]['year'];
+                              return Text(
+                                year.toString(),
+                                style: const TextStyle(fontSize: 11),
+                              );
+                            }
+                            return const Text('');
+                          },
+                        ),
+                      ),
+                      leftTitles: AxisTitles(
+                        axisNameWidget: const Padding(
+                          padding: EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            '',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 50,
+                          interval: 20000000,
+                          getTitlesWidget: (value, _) {
+                            return Text(
+                              '${(value / 1000000).toStringAsFixed(0)}M',
+                              style: const TextStyle(fontSize: 11),
+                            );
+                          },
+                        ),
+                      ),
+                      topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    ),
+                    gridData: FlGridData(
+                      show: true,
+                      horizontalInterval: 20000000,
+                      getDrawingHorizontalLine: (value) => FlLine(
+                        color: Colors.grey.withOpacity(0.2),
+                        strokeWidth: 1,
+                      ),
+                    ),
+                    borderData: FlBorderData(
+                      show: true,
+                      border: const Border(
+                        left: BorderSide(color: Colors.black, width: 1),
+                        bottom: BorderSide(color: Colors.black, width: 1),
+                      ),
+                    ),
+                    barGroups: List.generate(chartData.length, (index) {
+                      final population = chartData[index]['population'];
+                      return BarChartGroupData(
+                        x: index,
+                        barRods: [
+                          BarChartRodData(
+                            toY: (population as int).toDouble(),
+                            width: 50,
+                            color: Colors.deepPurple.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ],
+                      );
+                    }),
+                  ),
                 ),
-              );
-            },
-          ),
-        ),
-        titlesData: FlTitlesData(
-          bottomTitles: AxisTitles(
-          axisNameWidget: const Padding(
-          padding: EdgeInsets.only(top: 4), 
-          child: Text(
-            '',
-            style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 13,
-        ),
-      ),
-    ),
-    sideTitles: SideTitles(
-      showTitles: true,
-      reservedSize: 36,
-      getTitlesWidget: (value, _) {
-  final index = value.toInt();
-  if (index >= 0 && index < chartData.length) {
-    final year = chartData[index]['year'];
-    return Text(
-      year.toString(),
-      style: const TextStyle(fontSize: 11),
-    );
-  }
-  return const Text('');
-},
-    ),
-  ),
-  leftTitles: AxisTitles(
-    axisNameWidget: const Padding(
-      padding: EdgeInsets.only(bottom: 8),
-      child: Text(
-        '',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 13,
-        ),
-      ),
-    ),
-    sideTitles: SideTitles(
-      showTitles: true,
-      reservedSize: 50,
-      interval: 20000000,
-      getTitlesWidget: (value, _) {
-        return Text(
-          '${(value / 1000000).toStringAsFixed(0)}M',
-          style: const TextStyle(fontSize: 11),
-        );
-      },
-    ),
-  ),
-  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-),
-        gridData: FlGridData(
-          show: true,
-          horizontalInterval: 20000000,
-          getDrawingHorizontalLine: (value) => FlLine(
-            color: Colors.grey.withOpacity(0.2),
-            strokeWidth: 1,
-          ),
-        ),
-        borderData: FlBorderData(
-          show: true,
-          border: const Border(
-            left: BorderSide(color: Colors.black, width: 1),
-            bottom: BorderSide(color: Colors.black, width: 1),
-          ),
-        ),
-        barGroups: List.generate(chartData.length, (index) {
-          final population = chartData[index]['population'];
-          return BarChartGroupData(
-            x: index,
-            barRods: [
-              BarChartRodData(
-                toY: (population as int).toDouble(),
-                width: 50, 
-                color: Colors.deepPurple.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(4),
               ),
-            ],
-          );
-        }),
-      ),
-    ),
-  ),
-),
+            ),
+            const SizedBox(height: 32),
+            const Divider(height: 2, color: Colors.grey),
+            const SizedBox(height: 32),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  pie.PieChart(
+                    dataMap: {
+                      for (var e in donutData)
+                        e['year'].toString(): (e['population'] as int).toDouble(),
+                    },
+                    animationDuration: const Duration(milliseconds: 800),
+                    chartType: pie.ChartType.ring,
+                    chartRadius: MediaQuery.of(context).size.width / 2.2,
+                    colorList: [
+                        Colors.deepPurple,
+                        Colors.teal,
+                        Colors.amber,
+                        Colors.indigo,
+                        Colors.orange,
+                        Colors.pink,
+                        Colors.cyan,
+                        Colors.lime,
+                        Colors.brown,
+                        Colors.blueGrey,
+                        Colors.green,
+                      ],                    
+                    ringStrokeWidth: 32,
+                    legendOptions: const pie.LegendOptions(
+                      showLegends: true,
+                      legendPosition: pie.LegendPosition.right,
+                    ),
+                    chartValuesOptions: const pie.ChartValuesOptions(
+                      showChartValuesInPercentage: false,
+                      showChartValues: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ],
       ),
